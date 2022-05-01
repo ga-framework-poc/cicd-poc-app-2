@@ -1,0 +1,56 @@
+name: build-team-a
+on:
+  push:
+    branch: development
+  workflow_dispatch:
+jobs:
+  build-from-source:
+    uses: hippyod/cicd-manager/.github/workflows/build-from-source.yml@main
+    with:
+      system-name: system-a
+      team-name: team-a
+  deploy-to-dev:
+    needs: build-from-source
+    uses: hippyod/cicd-manager/.github/workflows/promote.yml@main
+    with:
+      system-name: system-a
+      team-name: team-a
+  gather-test-environments:
+    needs: deploy-to-dev
+    runs-on: ubuntu-latest
+    steps:
+    - id: setup-environment
+      name: setup-environment
+      run: |
+        set -x
+        echo "CICD_REPO_MGR_DIR=${GITHUB_WORKSPACE}/cicd-manager" >> ${GITHUB_ENV}
+        echo "SYSTEM_DEFS_DIR=${GITHUB_WORKSPACE}/cicd-manager/.github/system-defs" >> ${GITHUB_ENV}
+        echo "WORKING_DIR=${GITHUB_WORKSPACE}/${{ github.event.repository.name }}" >> ${GITHUB_ENV}
+        set +x
+
+        echo ::add-mask::$(cat /var/secrets/PAT_TOKEN)
+        echo "PAT_TOKEN=$(cat /var/secrets/PAT_TOKEN)" >> ${GITHUB_ENV}
+    - id: clone-cicd-manager-repo
+      name: clone-cicd-manager-repo
+      uses: actions/checkout@v2
+      with:
+        repository: hippyod/cicd-manager
+        ref: development
+        path: ${{ env.CICD_REPO_MGR_DIR }}
+        token: ${{ env.PAT_TOKEN }}
+    - id: parse-system-def
+      name: parse-system-def
+      run: |
+        SYSTEM_DEFS_FILE=$(ls ${SYSTEM_DEFS_DIR}/system-a.y*)
+        ENVIRONMENTS=$(yq e '.test-environments' "${SYSTEM_DEFS_FILE}" -o json)
+        echo "ENVIRONMENTS: ${ENVIRONMENTS}"
+        echo ::set-output name=test-environments::$(echo ${ENVIRONMENTS})
+    outputs:
+      test-environments: ${{ steps.parse-system-def.outputs.test-environments }}
+  deploy-to-test:
+    needs: gather-test-environments
+    uses: hippyod/cicd-manager/.github/workflows/promote.yml@main
+    with:
+      system-name: system-a
+      team-name: team-a
+      environments: ${{ needs.gather-test-environments.outputs.test-environments }}
