@@ -49,7 +49,7 @@ jobs:
       test-environments: ${{ steps.parse-system-def.outputs.test-environments }}
   deploy-to-test:
     needs: gather-test-environments
-    uses: hippyod/cicd-manager/.github/workflows/promote.yml@main
+    uses: hippyod/cicd-manager/.github/workflows/promote.yml@development
     with:
       system-name: system-a
       team-name: team-a
