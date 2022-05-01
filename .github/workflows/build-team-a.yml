@@ -22,14 +22,11 @@ jobs:
     - id: setup-environment
       name: setup-environment
       run: |
-        set -x
+        set -ex
         echo "CICD_REPO_MGR_DIR=${GITHUB_WORKSPACE}/cicd-manager" >> ${GITHUB_ENV}
         echo "SYSTEM_DEFS_DIR=${GITHUB_WORKSPACE}/cicd-manager/.github/system-defs" >> ${GITHUB_ENV}
         echo "WORKING_DIR=${GITHUB_WORKSPACE}/${{ github.event.repository.name }}" >> ${GITHUB_ENV}
-        set +x
-
-        echo ::add-mask::$(cat /var/secrets/PAT_TOKEN)
-        echo "PAT_TOKEN=$(cat /var/secrets/PAT_TOKEN)" >> ${GITHUB_ENV}
+        set +ex
     - id: clone-cicd-manager-repo
       name: clone-cicd-manager-repo
       uses: actions/checkout@v2
@@ -37,7 +34,6 @@ jobs:
         repository: hippyod/cicd-manager
         ref: development
         path: ${{ env.CICD_REPO_MGR_DIR }}
-        token: ${{ env.PAT_TOKEN }}
     - id: parse-system-def
       name: parse-system-def
       run: |
