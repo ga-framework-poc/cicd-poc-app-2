@@ -5,13 +5,13 @@ on:
   workflow_dispatch:
 jobs:
   build-from-source:
-    uses: hippyod/cicd-manager/.github/workflows/build-from-source.yml@main
+    uses: hippyod/cicd-manager/.github/workflows/build-from-source.yml@developer
     with:
       system-name: system-a
       team-name: team-a
   deploy-to-dev:
     needs: build-from-source
-    uses: hippyod/cicd-manager/.github/workflows/promote.yml@main
+    uses: hippyod/cicd-manager/.github/workflows/promote.yml@developer
     with:
       system-name: system-a
       team-name: team-a
