@@ -10,5 +10,5 @@ jobs:
       run: |
         set -ex
         echo "whereis podman: $(whereis podman)"
-        echo "whereis podman: $(whereis docker)"
+        echo "whereis docker: $(whereis docker)"
         set +ex
