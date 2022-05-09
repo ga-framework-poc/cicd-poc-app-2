@@ -1,4 +1,4 @@
-name: build-team-a
+name: build-system-a-team-a
 on:
   push:
     branch: development
@@ -8,7 +8,6 @@ jobs:
     uses: hippyod/cicd-manager/.github/workflows/build-from-source.yml@development
     with:
       system-name: system-a
-      team-name: team-a
   deploy-to-dev:
     needs: build-from-source
     uses: hippyod/cicd-manager/.github/workflows/promote.yml@development
