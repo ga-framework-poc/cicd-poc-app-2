@@ -5,16 +5,15 @@ on:
   workflow_dispatch:
 jobs:
   build-from-source:
-    uses: hippyod/cicd-manager/.github/workflows/build-from-source.yml@development
+    uses: ga-framework-poc/cicd-manager/.github/workflows/build-from-source.yml@development
     with:
       system-name: system-a
     secrets: inherit
   deploy-to-dev:
     needs: build-from-source
-    uses: hippyod/cicd-manager/.github/workflows/promote.yml@development
+    uses: ga-framework-poc/cicd-manager/.github/workflows/promote.yml@development
     with:
       system-name: system-a
-      team-name: team-a
     secrets: inherit
   gather-test-environments:
     needs: deploy-to-dev
@@ -32,7 +31,7 @@ jobs:
       name: clone-cicd-manager-repo
       uses: actions/checkout@v2
       with:
-        repository: hippyod/cicd-manager
+        repository: ga-framework-poc/cicd-manager
         ref: development
         path: ${{ env.CICD_REPO_MGR_DIR }}
     - id: parse-component-def
@@ -46,8 +45,7 @@ jobs:
       test-environments: ${{ steps.parse-component-def.outputs.test-environments }}
   deploy-to-test:
     needs: gather-test-environments
-    uses: hippyod/cicd-manager/.github/workflows/promote.yml@development
+    uses: ga-framework-poc/cicd-manager/.github/workflows/promote.yml@development
     with:
       system-name: system-a
-      team-name: team-a
       environments: ${{ needs.gather-test-environments.outputs.test-environments }}
