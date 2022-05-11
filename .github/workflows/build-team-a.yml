@@ -9,43 +9,8 @@ jobs:
     with:
       system-name: system-a
     secrets: inherit
-  deploy-to-dev:
-    needs: build-from-source
-    uses: ga-framework-poc/cicd-manager/.github/workflows/promote.yml@development
-    with:
-      system-name: system-a
-    secrets: inherit
-  gather-test-environments:
-    needs: deploy-to-dev
-    runs-on: ubuntu-latest
-    steps:
-    - id: setup-environment
-      name: setup-environment
-      run: |
-        set -ex
-        echo "CICD_REPO_MGR_DIR=${GITHUB_WORKSPACE}/cicd-manager" >> ${GITHUB_ENV}
-        echo "SYSTEM_DEFS_DIR=${GITHUB_WORKSPACE}/cicd-manager/.github/system-defs" >> ${GITHUB_ENV}
-        echo "WORKING_DIR=${GITHUB_WORKSPACE}/${{ github.event.repository.name }}" >> ${GITHUB_ENV}
-        set +ex
-    - id: clone-cicd-manager-repo
-      name: clone-cicd-manager-repo
-      uses: actions/checkout@v2
-      with:
-        repository: ga-framework-poc/cicd-manager
-        ref: development
-        path: ${{ env.CICD_REPO_MGR_DIR }}
-    - id: parse-component-def
-      name: parse-component-def
-      run: |
-        SYSTEM_DEFS_FILE=$(ls ${SYSTEM_DEFS_DIR}/system-a.y*)
-        TEST_ENVIRONMENTS=$(yq '.test-environments' "${SYSTEM_DEFS_FILE}" -o json)
-        echo "TEST_ENVIRONMENTS: ${TEST_ENVIRONMENTS}"
-        echo ::set-output name=test-environments::$(echo ${TEST_ENVIRONMENTS})
-    outputs:
-      test-environments: ${{ steps.parse-component-def.outputs.test-environments }}
-  deploy-to-test:
+  deploy-to-all:
     needs: gather-test-environments
     uses: ga-framework-poc/cicd-manager/.github/workflows/promote.yml@development
     with:
       system-name: system-a
-      environments: ${{ needs.gather-test-environments.outputs.test-environments }}
