@@ -10,7 +10,7 @@ jobs:
       system-name: system-a
     secrets: inherit
   deploy-to-all:
-    needs: gather-test-environments
+    needs: build-from-source
     uses: ga-framework-poc/cicd-manager/.github/workflows/promote.yml@development
     with:
       system-name: system-a
