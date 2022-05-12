@@ -14,3 +14,4 @@ jobs:
     uses: ga-framework-poc/cicd-manager/.github/workflows/promote.yml@development
     with:
       system-name: system-a
+    secrets: inherit
